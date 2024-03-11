@@ -32,3 +32,8 @@ variable "rke2_version" {
   type        = string
   description = "RKE2 version"
 }
+
+variable "network_name" {
+  type        = string
+  description = "Harvester network name"
+}

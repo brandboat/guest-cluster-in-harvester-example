@@ -13,6 +13,19 @@ resource "rancher2_cluster_v2" "rancher_guest_cluster_harvester_cloud_provider" 
   kubernetes_version = var.rke2_version
 
   rke_config {
+    # machine_pools {
+    #   name                         = "allinone"
+    #   cloud_credential_secret_name = var.harvester_cloud_credential_id
+    #   control_plane_role           = true
+    #   etcd_role                    = true
+    #   worker_role                  = true
+    #   quantity                     = 3
+    #   machine_config {
+    #     kind = rancher2_machine_config_v2.harvesterkvm.kind
+    #     name = rancher2_machine_config_v2.harvesterkvm.name
+    #   }
+    # }
+
     machine_pools {
       name                         = "controlerplan"
       cloud_credential_secret_name = var.harvester_cloud_credential_id
@@ -45,6 +58,20 @@ resource "rancher2_cluster_v2" "rancher_guest_cluster_harvester_cloud_provider" 
         cloud-provider-name = "harvester"
         cloud-provider-config = data.local_file.cloud_provider_config.content
       })
+    }
+
+    machine_global_config = <<EOF
+cni: "calico"
+disable-kube-proxy: false
+etcd-expose-metrics: false
+EOF
+    upgrade_strategy {
+      control_plane_concurrency = "1"
+      worker_concurrency = "1"
+    }
+    etcd {
+      snapshot_schedule_cron = "0 */5 * * *"
+      snapshot_retention = 5
     }
 
     chart_values = <<EOF
