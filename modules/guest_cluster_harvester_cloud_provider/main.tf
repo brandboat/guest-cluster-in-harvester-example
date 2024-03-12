@@ -12,30 +12,19 @@ resource "rancher2_cluster_v2" "rancher_guest_cluster_harvester_cloud_provider" 
   cloud_credential_secret_name = var.harvester_cloud_credential_id
   kubernetes_version = var.rke2_version
 
+  # note that different machine_pools shoud use different machine_config
+  # more info see comments in https://github.com/harvester/harvester/issues/5330#issuecomment-1988323218
   rke_config {
-    # machine_pools {
-    #   name                         = "allinone"
-    #   cloud_credential_secret_name = var.harvester_cloud_credential_id
-    #   control_plane_role           = true
-    #   etcd_role                    = true
-    #   worker_role                  = true
-    #   quantity                     = 3
-    #   machine_config {
-    #     kind = rancher2_machine_config_v2.harvesterkvm.kind
-    #     name = rancher2_machine_config_v2.harvesterkvm.name
-    #   }
-    # }
-
     machine_pools {
-      name                         = "controlerplan"
+      name                         = "controlplane"
       cloud_credential_secret_name = var.harvester_cloud_credential_id
       control_plane_role           = true
       etcd_role                    = true
       worker_role                  = false
       quantity                     = 1
       machine_config {
-        kind = rancher2_machine_config_v2.harvesterkvm.kind
-        name = rancher2_machine_config_v2.harvesterkvm.name
+        kind = rancher2_machine_config_v2.controlplane.kind
+        name = rancher2_machine_config_v2.controlplane.name
       }
     }
 
@@ -48,8 +37,8 @@ resource "rancher2_cluster_v2" "rancher_guest_cluster_harvester_cloud_provider" 
       quantity                     = 1
       drain_before_delete = true
       machine_config {
-        kind = rancher2_machine_config_v2.harvesterkvm.kind
-        name = rancher2_machine_config_v2.harvesterkvm.name
+        kind = rancher2_machine_config_v2.worker.kind
+        name = rancher2_machine_config_v2.worker.name
       }
     }
     
